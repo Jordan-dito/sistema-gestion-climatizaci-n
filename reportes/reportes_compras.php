@@ -432,30 +432,130 @@ include('../app/controllers/compras/listado_de_compras.php');
 
                 // Verificar si 'compras' es un arreglo y tiene datos
                 if (Array.isArray(response) && response.length > 0) {
+                    // Destruir el DataTable actual antes de actualizar
+                    $('#example1').DataTable().destroy();
+                    
+                    // Limpiar el tbody
+                    tbody.empty();
+                    
                     // Iterar sobre los datos recibidos y agregar filas a la tabla
                     response.forEach(function(compra) {
                         tbody.append(`
                           <tr>
-                <td>${compra.nro}</td> <!-- Nro -->
-                <td>${compra.nro_compra}</td> <!-- Nro de la compra -->
-                <td>${compra.nombre_producto}</td> <!-- Producto -->
-                <td>${compra.fecha_compra}</td> <!-- Fecha de compra -->
-                <td>${compra.nombre_proveedor}</td> <!-- Proveedor -->
-                <td>${compra.comprobante}</td> <!-- Comprobante -->
-                <td>${compra.nombres_usuario}</td> <!-- Usuario -->
-                <td>${compra.precio_compra}</td> <!-- Precio compra -->
-                <td>${compra.cantidad}</td> <!-- Cantidad -->
+                <td>${compra.nro || ''}</td> <!-- Nro - usando el campo nro del servidor -->
+                <td>${compra.nro_compra || ''}</td> <!-- Nro de la compra -->
+                <td>${compra.nombre_producto || ''}</td> <!-- Producto -->
+                <td>${compra.fecha_compra || ''}</td> <!-- Fecha de compra -->
+                <td>${compra.nombre_proveedor || ''}</td> <!-- Proveedor -->
+                <td>${compra.comprobante || ''}</td> <!-- Comprobante -->
+                <td>${compra.nombres_usuario || ''}</td> <!-- Usuario -->
+                <td>${compra.precio_compra || ''}</td> <!-- Precio compra -->
+                <td>${compra.cantidad || ''}</td> <!-- Cantidad -->
                 <td>
                     <div class="btn-group">
-                        <a href="../compras/show.php?id=${compra.id_compra}" type="button" class="btn btn-info btn-sm"><i class="fa fa-eye"></i> Ver</a>
-                        <a href="../compras/update.php?id=${compra.id_compra}" type="button" class="btn btn-success btn-sm"><i class="fa fa-pencil-alt"></i> Editar</a>
-                        <a href="../compras/delete.php?id=${compra.id_compra}" type="button" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Borrar</a>
+                        <a href="../compras/show.php?id=${compra.id_compra || ''}" type="button" class="btn btn-info btn-sm"><i class="fa fa-eye"></i> Ver</a>
+                        <a href="../compras/update.php?id=${compra.id_compra || ''}" type="button" class="btn btn-success btn-sm"><i class="fa fa-pencil-alt"></i> Editar</a>
+                        <a href="../compras/delete.php?id=${compra.id_compra || ''}" type="button" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Borrar</a>
                     </div>
-                </td> <!-- Solo en esta columna se muestran los botones de acción -->
+                </td>
             </tr>
                         `);
                     });
+                    
+                    // Reinicializar el DataTable con la configuración original
+                    $('#example1').DataTable({
+                        responsive: true,
+                        dom: 'Bfrtip',
+                        buttons: [{
+                                extend: 'copy',
+                                text: 'Copiar',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'excel',
+                                text: 'Exportar a Excel',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'csv',
+                                text: 'Exportar a CSV',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'pdf',
+                                text: 'Exportar a PDF',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'print',
+                                text: 'Imprimir',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            }
+                        ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"
+                        }
+                    });
                 } else {
+                    // Destruir el DataTable y mostrar mensaje
+                    $('#example1').DataTable().destroy();
+                    tbody.empty();
+                    
+                    // Reinicializar DataTable vacío
+                    $('#example1').DataTable({
+                        responsive: true,
+                        dom: 'Bfrtip',
+                        buttons: [{
+                                extend: 'copy',
+                                text: 'Copiar',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'excel',
+                                text: 'Exportar a Excel',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'csv',
+                                text: 'Exportar a CSV',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'pdf',
+                                text: 'Exportar a PDF',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            },
+                            {
+                                extend: 'print',
+                                text: 'Imprimir',
+                                exportOptions: {
+                                    columns: ':not(:last-child)'
+                                }
+                            }
+                        ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"
+                        }
+                    });
+                    
                     Swal.fire({
                         icon: 'info',
                         title: 'Sin resultados',
@@ -464,9 +564,6 @@ include('../app/controllers/compras/listado_de_compras.php');
                         confirmButtonColor: '#3085d6'
                     });
                 }
-
-                // Reinicializar el DataTable después de actualizar los datos
-                $('#example1').DataTable().clear().rows.add(tbody.find('tr')).draw();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error("Error en la solicitud AJAX:", textStatus, errorThrown);

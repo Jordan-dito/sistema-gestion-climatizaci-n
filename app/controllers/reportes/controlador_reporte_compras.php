@@ -16,10 +16,17 @@ if (isset($_GET['fechaInicio']) && isset($_GET['fechaFin'])) {
         $stmt->execute();
 
         // Recupera todos los resultados en forma de arreglo asociativo
-        $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $compras = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Agregar campo 'nro' a cada registro para la numeración
+        $contador = 0;
+        foreach ($compras as &$compra) {
+            $contador++;
+            $compra['nro'] = $contador;
+        }
 
         // Retornar los resultados como JSON
-        echo json_encode($clientes);
+        echo json_encode($compras);
     } catch (PDOException $e) {
         // Manejo de errores en caso de que falle la consulta
         http_response_code(500); // Establece el código de respuesta HTTP a 500 (Error interno del servidor)
