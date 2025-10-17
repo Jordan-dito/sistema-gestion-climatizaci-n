@@ -68,7 +68,7 @@ try {
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
                         <button class="btn btn-primary me-2" type="submit"><i class="fas fa-search"></i> Filtrar</button>
-                        <a href="<?php echo $URL; ?>/almacen/kardex_fifo.php" class="btn btn-secondary">
+                        <a href="<?php echo $URL; ?>/reportes/reporte_kardex.php" class="btn btn-secondary">
                             <i class="fas fa-broom"></i> Limpiar
                         </a>
                     </div>
