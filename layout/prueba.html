@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Permisos</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Lista de Asignaciones del Sistema</h2>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="show-entries">Muestra</label>
+                <select class="form-control" id="show-entries">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-md-6 text-right">
+                <label for="search">Buscar:</label>
+                <input type="text" class="form-control" id="search" placeholder="Buscar...">
+            </div>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Permiso</th>
+                    <th>Perfil</th>
+                    <th>Status</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="permissions-table">
+                <tr>
+                    <td>Privilegios</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Módulo</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Opciones del Sistema</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Proveedor</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Perfiles</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Usuario</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Reporte de Usuario</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Estado Civil</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Género</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+                <tr>
+                    <td>Distribuidora</td>
+                    <td>ADMINISTRADOR</td>
+                    <td>Activo</td>
+                    <td><button class="btn btn-primary">Editar</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('search').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#permissions-table tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const permiso = cells[0].textContent.toLowerCase();
+                const perfil = cells[1].textContent.toLowerCase();
+                
+                if (permiso.includes(searchTerm) || perfil.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        document.getElementById('show-entries').addEventListener('change', function() {
+            const entriesToShow = parseInt(this.value, 10);
+            const rows = document.querySelectorAll('#permissions-table tr');
+            
+            rows.forEach((row, index) => {
+                if (index < entriesToShow) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Trigger the change event on page load to set the initial state
+        document.getElementById('show-entries').dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>

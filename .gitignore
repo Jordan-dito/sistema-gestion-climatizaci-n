@@ -1,0 +1,108 @@
+# Archivos de configuración sensibles
+app/config.php
+config.php
+*.env
+
+# Credenciales y configuraciones locales
+/login/vendor/composer/installed.json
+/composer/
+
+# Bases de datos
+*.sql
+*.sqlite
+*.db
+
+# Archivos de sesión PHP
+*.sess
+sessions/
+
+# Logs
+*.log
+logs/
+error_log
+debug.log
+
+# Archivos temporales
+*.tmp
+*.temp
+*.cache
+/tmp/
+/temp/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# IDEs y editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+nbproject/
+
+# Node modules (si aplica)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Dependencias de Composer
+/vendor/
+composer.phar
+composer.lock
+
+# Archivos de backup
+*.bak
+*.backup
+*~
+*.old
+
+# Carpetas de Windows específicas
+$Recycle.Bin/
+$Windows.~WS/
+.GamingRoot
+
+# Archivos del sistema
+hiberfil.sys
+pagefile.sys
+swapfile.sys
+DumpStack.log
+DumpStack.log.tmp
+*.dll
+
+# Programas instalados (no relacionados con el proyecto)
+/Program Files (x86)/
+/Program Files/
+/ProgramData/
+/Windows/
+/xampp/
+/composer/
+/dev/
+/proyecto/
+/ngrok/
+/gradle-8.12-bin/
+/SamFwTool/
+/SWSetup/
+/SQL2022/
+/Riot Games/
+/Boot/
+/Action!/
+/edb/
+
+# Imágenes subidas por usuarios (opcional, según necesites versionar)
+# almacen/img_productos/*
+# !almacen/img_productos/.gitkeep
+
+# Cache de PHP
+opcache/
+*.opcache
+
+# Archivos de configuración de servidor
+.htaccess.bak
+php.ini.bak
+
