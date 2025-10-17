@@ -74,6 +74,18 @@ if ($result->rowCount() > 0) {
                         <div class="card-body" style="display: block;">
                             <table id="example1" class="table table-bordered table-striped">
                                 <!-- <table id="datatablesSimple" class="table table-bordered table-hover mb-0"> -->
+                                <thead>
+                                    <tr>
+                                        <th>Nombres</th>
+                                        <th>Apellidos</th>
+                                        <th>Día Inicio</th>
+                                        <th>Día Fin</th>
+                                        <th>Horario Inicio</th>
+                                        <th>Horario Fin</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <?php foreach ($tecnicos as $tecnico) : ?>
                                         <tr>

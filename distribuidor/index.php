@@ -238,22 +238,17 @@ try {
                                                     <i class="fas fa-edit"></i>
                                                 </a>
 
+                                                <?php if ($distribuidora['estado'] == 'Activo'): ?>
+                                                    <a href="#" class="btn btn-danger" onclick="eliminarDistribuidora(<?php echo $distribuidora['id_distribuidora']; ?>)">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                <?php endif; ?>
 
-
-
-
-                                                <a href="#" class="btn btn-danger" onclick="eliminarDistribuidora(<?php echo $distribuidora['id_distribuidora']; ?>)">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
-
-
-                                                <a href="#" class="btn btn-success" onclick="activarDistribuidora(<?php echo $distribuidora['id_distribuidora']; ?>)">
-                                                    <i class="fas fa-toggle-on"></i>
-                                                </a>
-
-
-
-
+                                                <?php if ($distribuidora['estado'] == 'Inactivo'): ?>
+                                                    <a href="#" class="btn btn-success" onclick="activarDistribuidora(<?php echo $distribuidora['id_distribuidora']; ?>)">
+                                                        <i class="fas fa-toggle-on"></i>
+                                                    </a>
+                                                <?php endif; ?>
 
                                             </td>
                                         </tr>
