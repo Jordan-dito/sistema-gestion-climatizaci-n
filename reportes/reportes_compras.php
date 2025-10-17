@@ -95,11 +95,10 @@ include('../app/controllers/compras/listado_de_compras.php');
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $contador = 0;
                                             foreach ($compras_datos as $compras_dato) {
                                                 $id_compra = $compras_dato['id_compra']; ?>
                                                 <tr>
-                                                    <td><?php echo $contador = $contador + 1; ?></td>
+                                                    <td></td> <!-- Nro - será calculado automáticamente por DataTables -->
                                                     <td><?php echo $compras_dato['nro_compra']; ?></td>
                                                     <td>
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
@@ -333,6 +332,64 @@ include('../app/controllers/compras/listado_de_compras.php');
 <?php include('../layout/mensajes.php'); ?>
 <?php include('../layout/parte2.php'); ?>
 
+<!-- DataTables CSS CDNs -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
+
+<style>
+/* Estilos adicionales para DataTables paginación */
+.dataTables_wrapper .dataTables_paginate {
+    float: right;
+    text-align: right;
+    padding-top: 0.25em;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    box-sizing: border-box;
+    display: inline-block;
+    min-width: 1.5em;
+    padding: 0.5em 1em;
+    margin-left: 2px;
+    text-align: center;
+    text-decoration: none !important;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: transparent;
+    color: #333 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: white !important;
+    border: 1px solid #111;
+    background-color: #585858;
+    background: linear-gradient(to bottom, #585858 0%, #111 100%);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    color: white !important;
+    border: 1px solid #979797;
+    background-color: white;
+    background: linear-gradient(to bottom, #fff 0%, #dcdcdc 100%);
+    color: #111 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    cursor: default;
+    color: #666 !important;
+    border: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    color: #666 !important;
+    border: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
+}
+</style>
+
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -346,6 +403,8 @@ include('../app/controllers/compras/listado_de_compras.php');
         $('#example1').DataTable({
             responsive: true,
             dom: 'Bfrtip',
+            pageLength: 10, // Mostrar 10 registros por página
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]], // Opciones de registros por página
             buttons: [{
                     extend: 'copy',
                     text: 'Copiar',
@@ -383,7 +442,27 @@ include('../app/controllers/compras/listado_de_compras.php');
                 }
             ],
             language: {
-                url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json" // Traducción al español
+                url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json", // Traducción al español
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            },
+            columnDefs: [
+                {
+                    targets: 0, // Columna Nro
+                    render: function(data, type, row, meta) {
+                        // Usar la numeración automática de DataTables
+                        return meta.settings._iDisplayStart + meta.row + 1;
+                    }
+                }
+            ],
+            drawCallback: function(settings) {
+                // Asegurar que la paginación se renderice correctamente
+                var api = this.api();
+                api.columns.adjust().responsive.recalc();
             }
         });
     });
@@ -442,7 +521,7 @@ include('../app/controllers/compras/listado_de_compras.php');
                     response.forEach(function(compra) {
                         tbody.append(`
                           <tr>
-                <td>${compra.nro || ''}</td> <!-- Nro - usando el campo nro del servidor -->
+                <td></td> <!-- Nro - será calculado automáticamente por DataTables -->
                 <td>${compra.nro_compra || ''}</td> <!-- Nro de la compra -->
                 <td>${compra.nombre_producto || ''}</td> <!-- Producto -->
                 <td>${compra.fecha_compra || ''}</td> <!-- Fecha de compra -->
@@ -466,6 +545,8 @@ include('../app/controllers/compras/listado_de_compras.php');
                     $('#example1').DataTable({
                         responsive: true,
                         dom: 'Bfrtip',
+                        pageLength: 10,
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
                         buttons: [{
                                 extend: 'copy',
                                 text: 'Copiar',
@@ -503,7 +584,26 @@ include('../app/controllers/compras/listado_de_compras.php');
                             }
                         ],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"
+                            url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json",
+                            paginate: {
+                                first: "Primero",
+                                last: "Último",
+                                next: "Siguiente",
+                                previous: "Anterior"
+                            }
+                        },
+                        columnDefs: [
+                            {
+                                targets: 0, // Columna Nro
+                                render: function(data, type, row, meta) {
+                                    // Usar la numeración automática de DataTables
+                                    return meta.settings._iDisplayStart + meta.row + 1;
+                                }
+                            }
+                        ],
+                        drawCallback: function(settings) {
+                            var api = this.api();
+                            api.columns.adjust().responsive.recalc();
                         }
                     });
                 } else {
@@ -515,6 +615,8 @@ include('../app/controllers/compras/listado_de_compras.php');
                     $('#example1').DataTable({
                         responsive: true,
                         dom: 'Bfrtip',
+                        pageLength: 10,
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
                         buttons: [{
                                 extend: 'copy',
                                 text: 'Copiar',
@@ -552,7 +654,26 @@ include('../app/controllers/compras/listado_de_compras.php');
                             }
                         ],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"
+                            url: "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json",
+                            paginate: {
+                                first: "Primero",
+                                last: "Último",
+                                next: "Siguiente",
+                                previous: "Anterior"
+                            }
+                        },
+                        columnDefs: [
+                            {
+                                targets: 0, // Columna Nro
+                                render: function(data, type, row, meta) {
+                                    // Usar la numeración automática de DataTables
+                                    return meta.settings._iDisplayStart + meta.row + 1;
+                                }
+                            }
+                        ],
+                        drawCallback: function(settings) {
+                            var api = this.api();
+                            api.columns.adjust().responsive.recalc();
                         }
                     });
                     
