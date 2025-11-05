@@ -40,14 +40,9 @@ if ($ultima_factura) {
 
 
 
-// Consulta para obtener productos activos de la categoría "repuestos"
-$sqlProductos = "SELECT a.id_producto, a.codigo, a.nombre, a.id_categoria, a.imagen, a.precio_venta, a.estado, a.descripcion, c.nombre_categoria
-                 FROM tb_almacen a
-                 INNER JOIN tb_categorias c ON a.id_categoria = c.id_categoria
-                 WHERE LOWER(c.nombre_categoria) = 'repuestos'
-                   AND a.estado = 'activo'";
-$stmtProductos = $pdo->query($sqlProductos);
-$productos = $stmtProductos->fetchAll(PDO::FETCH_ASSOC);
+// Nota: Los productos de A/C se cargarán dinámicamente por AJAX cuando el usuario ingrese la cédula
+// Solo mostraremos los equipos A/C que el cliente específico ha comprado
+$productos = []; // Inicialmente vacío, se llenará con AJAX
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -210,18 +205,19 @@ $productos = $stmtProductos->fetchAll(PDO::FETCH_ASSOC);
                             <!-- Separador -->
                             <hr>
 
-                            <!-- Botón para seleccionar Repuesto y Modal -->
+                            <!-- Botón para seleccionar Equipo A/C -->
                             <div class="form-group">
-                                <label for="repuesto">Repuesto:</label>
+                                <label for="equipo_ac">Equipo A/C:</label>
                                 <div class="input-group">
-                                    <input type="text" id="repuesto" name="repuesto" class="form-control" readonly>
+                                    <input type="text" id="equipo_ac" name="equipo_ac" class="form-control" readonly>
 
                                     <div class="input-group-append">
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalRepuesto">
-                                            Seleccionar Repuesto
+                                        <button type="button" id="btnSeleccionarEquipo" class="btn btn-primary" data-toggle="modal" data-target="#modalRepuesto" disabled>
+                                            Seleccionar Equipo A/C
                                         </button>
                                     </div>
                                 </div>
+                                <small class="text-muted">Primero ingresa la cédula del cliente para ver sus equipos A/C comprados.</small>
                             </div>
 
                             <!-- Modal para seleccionar repuesto -->
@@ -231,13 +227,16 @@ $productos = $stmtProductos->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="modal-dialog modal-lg" role="document"> <!-- Modal grande -->
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="modalRepuestoLabel">Seleccionar Repuesto</h5>
+                                            <h5 class="modal-title" id="modalRepuestoLabel">Equipos A/C Comprados por el Cliente</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <!-- Lista de repuestos en una tabla -->
+                                            <div id="mensajeModal" class="alert alert-info">
+                                                Cargando equipos A/C del cliente...
+                                            </div>
+                                            <!-- Lista de equipos A/C en una tabla -->
                                             <table class="table table-bordered">
                                                 <thead>
                                                     <tr>
@@ -249,30 +248,13 @@ $productos = $stmtProductos->fetchAll(PDO::FETCH_ASSOC);
                                                         <th>Seleccionar</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                         <?php foreach ($productos as $producto): ?>
-  <tr>
-    <td><?= htmlspecialchars($producto['codigo']); ?></td>
-    <td><?= htmlspecialchars($producto['nombre']); ?></td>
-    <td><?= htmlspecialchars($producto['descripcion']); ?></td>
-    <td><img src="<?= $URL . '/almacen/img_productos/' . $producto['imagen']; ?>" alt="Imagen" width="50"></td>
-    <td><?= htmlspecialchars($producto['precio_venta']); ?></td>
-    <td>
-      <button type="button" class="btn btn-success btn-sm"
-        onclick="agregarAlCarrito(
-          '<?= $producto['id_producto']; ?>',
-          '<?= addslashes($producto['codigo']); ?>',
-          '<?= addslashes($producto['nombre']); ?>',
-          '<?= addslashes($producto['descripcion']); ?>',
-          '<?= addslashes($producto['precio_venta']); ?>'
-        )">
-        Agregar
-      </button>
-    </td>
-  </tr>
-<?php endforeach; ?>
-
-
+                                                <tbody id="tablaEquiposBody">
+                                                    <!-- Los equipos A/C se cargarán dinámicamente aquí -->
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted">
+                                                            Ingresa la cédula del cliente para ver sus equipos A/C
+                                                        </td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -285,15 +267,15 @@ $productos = $stmtProductos->fetchAll(PDO::FETCH_ASSOC);
 
                             <!-- Espacio en blanco para mostrar datos -->
                             <!-- Área para mostrar el resumen (precio venta, adicional y total) -->
-                            <!-- 🔁 Carrito de repuestos -->
+                            <!-- 🔁 Carrito de equipos A/C -->
                             <div class="form-group">
-                                <label>Repuestos seleccionados</label>
+                                <label>Equipos A/C seleccionados para instalación</label>
 
                                 <!-- IVA por defecto para nuevos ítems -->
                                 <div class="mb-2">
                                     <label for="iva_repuesto">IVA por defecto (%)</label>
                                     <input type="number" id="iva_repuesto" class="form-control" value="15" min="0" max="100" step="0.01">
-                                    <small class="text-muted">Este IVA se usará como valor inicial al añadir repuestos (podrás editarlo por ítem).</small>
+                                    <small class="text-muted">Este IVA se usará como valor inicial al añadir equipos (podrás editarlo por ítem).</small>
                                 </div>
 
                                 <div class="table-responsive">
@@ -436,7 +418,7 @@ function renderCarrito() {
         });
 
         const resumenTexto =
-`Repuestos seleccionados:
+`Equipos A/C seleccionados para instalación:
 ${lineas.join('\n')}
 
 Resumen:
@@ -482,7 +464,7 @@ Total con IVA: $${totalGeneral.toFixed(2)}
 
     function guardarOrden() {
         if (carrito.length === 0) {
-            Swal.fire("Carrito vacío", "Agrega al menos un repuesto.", "warning");
+            Swal.fire("Carrito vacío", "Agrega al menos un equipo A/C para la instalación.", "warning");
             return;
         }
 
@@ -565,10 +547,14 @@ Total con IVA: $${totalGeneral.toFixed(2)}
                         document.getElementById('nombre').value = data.nombre;
                         document.getElementById('correo').value = data.correo;
                         console.log("Respuesta recibida:", data);
+                        
+                        // 🆕 Cargar equipos A/C del cliente
+                        cargarEquiposAC(cedulaValor);
                     } else {
                         // Limpiar los campos
                         document.getElementById('nombre').value = "";
                         document.getElementById('correo').value = "";
+                        limpiarEquiposAC();
                         // Mostrar SweetAlert2 de error
                         Swal.fire({
                             icon: 'error',
@@ -580,6 +566,7 @@ Total con IVA: $${totalGeneral.toFixed(2)}
                 })
                 .catch(error => {
                     console.error("Error al buscar cliente:", error);
+                    limpiarEquiposAC();
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -590,8 +577,110 @@ Total con IVA: $${totalGeneral.toFixed(2)}
             // Si la longitud es menor o mayor a 10, limpiamos los campos
             document.getElementById('nombre').value = "";
             document.getElementById('correo').value = "";
+            limpiarEquiposAC();
             console.log("La cédula no tiene 10 dígitos. Valor ingresado:", cedulaValor);
         }
+    }
+
+    // 🆕 Función para cargar equipos A/C comprados por el cliente
+    function cargarEquiposAC(cedula) {
+        const url = `../app/controllers/ventas/buscar_ventas_por_cedula.php?cedula=${cedula}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.productos && data.productos.length > 0) {
+                    // Llenar la tabla con los equipos
+                    const tbody = document.getElementById('tablaEquiposBody');
+                    const mensajeModal = document.getElementById('mensajeModal');
+                    
+                    tbody.innerHTML = '';
+                    mensajeModal.style.display = 'none';
+                    
+                    data.productos.forEach(producto => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${producto.id_producto || 'N/A'}</td>
+                            <td>${producto.nombre || 'N/A'}</td>
+                            <td>${producto.descripcion || 'Sin descripción'}</td>
+                            <td><span class="badge badge-info">Cantidad: ${producto.cantidad_total || 1}</span></td>
+                            <td>$${parseFloat(producto.precio_venta || 0).toFixed(2)}</td>
+                            <td>
+                                <button type="button" class="btn btn-success btn-sm"
+                                    onclick="agregarAlCarrito(
+                                        '${producto.id_producto}',
+                                        '${producto.id_producto}',
+                                        '${producto.nombre.replace(/'/g, "\\'")}',
+                                        '${(producto.descripcion || '').replace(/'/g, "\\'")}',
+                                        '${producto.precio_venta}'
+                                    )">
+                                    Agregar
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    
+                    // Habilitar el botón de seleccionar equipo
+                    document.getElementById('btnSeleccionarEquipo').disabled = false;
+                    
+                    console.log("Equipos A/C cargados:", data.productos);
+                } else {
+                    // No hay equipos A/C comprados
+                    const tbody = document.getElementById('tablaEquiposBody');
+                    const mensajeModal = document.getElementById('mensajeModal');
+                    
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center text-warning">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                Este cliente no ha comprado equipos A/C
+                            </td>
+                        </tr>
+                    `;
+                    
+                    mensajeModal.innerHTML = 'Este cliente no tiene equipos A/C comprados.';
+                    mensajeModal.className = 'alert alert-warning';
+                    mensajeModal.style.display = 'block';
+                    
+                    // Deshabilitar el botón
+                    document.getElementById('btnSeleccionarEquipo').disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error("Error al cargar equipos A/C:", error);
+                const tbody = document.getElementById('tablaEquiposBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">
+                            <i class="fas fa-times-circle"></i> 
+                            Error al cargar los equipos A/C
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('btnSeleccionarEquipo').disabled = true;
+            });
+    }
+
+    // 🆕 Función para limpiar la tabla de equipos
+    function limpiarEquiposAC() {
+        const tbody = document.getElementById('tablaEquiposBody');
+        const mensajeModal = document.getElementById('mensajeModal');
+        
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    Ingresa la cédula del cliente para ver sus equipos A/C
+                </td>
+            </tr>
+        `;
+        
+        mensajeModal.innerHTML = 'Cargando equipos A/C del cliente...';
+        mensajeModal.className = 'alert alert-info';
+        mensajeModal.style.display = 'block';
+        
+        // Deshabilitar el botón
+        document.getElementById('btnSeleccionarEquipo').disabled = true;
     }
 </script>
 <?php include('../layout/mensajes.php'); ?>
