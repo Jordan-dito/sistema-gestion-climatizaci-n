@@ -10,7 +10,7 @@
 
 <style>
     body {
-        background: url('https://url-a-tu-imagen.com/imagen.jpg') no-repeat center center fixed; 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         background-size: cover;
     }
     .card {
@@ -86,12 +86,18 @@ document.getElementById('reset-password-form').addEventListener('submit', functi
         Swal.fire({
             title: data.status === 'success' ? 'Éxito' : 'Error',
             text: data.message,
-            icon: data.status === 'success' ? 'success' : 'error'
+            icon: data.status === 'success' ? 'success' : 'error',
+            confirmButtonText: data.status === 'success' ? 'Ir al Login' : 'Aceptar'
         }).then((result) => {
             if (result.isConfirmed || result.isDismissed) {
-                // Limpiar el formulario si se desea, o redirigir al usuario
-                document.getElementById('cedula').value = '';
-                document.getElementById('password').value = '';
+                if (data.status === 'success') {
+                    // Redirigir al login si fue exitoso
+                    window.location.href = 'index.php';
+                } else {
+                    // Limpiar el formulario si hubo error
+                    document.getElementById('cedula').value = '';
+                    document.getElementById('password').value = '';
+                }
             }
         });
     })
